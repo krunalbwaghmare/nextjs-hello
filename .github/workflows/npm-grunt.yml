@@ -1,42 +1,29 @@
-name: CI/CD for Next.js on EC2
+name: Deploy
 
 on:
   push:
-    branches:
-      - main # Change this to your main branch name
+    branches: [ dev ]
 
 jobs:
-  deploy:
+  Deploy:
+    name: Deploy to EC2
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2 
+      - name: Build & Deploy
+        env:
+            PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+            HOSTNAME: ${{secrets.SSH_HOST}}
+            USER_NAME: ${{secrets.USER_NAME}}
+      
+        run: |
+          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
 
-      - name: Install Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-
-      - name: Install dependencies
-        run: npm install
-
-      # - name: Build Next.js app
-      #   run: npm run build
-
-      - name: Deploy to EC2 instance
-        uses: easingthemes/ssh-deploy@main
-        with:
-          REMOTE_HOST: ${{ secrets.EC2_HOST }}
-          REMOTE_USER: ${{ secrets.EC2_USERNAME }}
-          SSH_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
-          script: |
-            cd /home/ubuntu/test
-            git pull origin main
-            npm install
-            npm run build
-          port: 22
-          timeout: 30s
-          command_timeout: 10m
-          proxy_port: 22
-          proxy_timeout: 30s
+              # Now we have got the access of EC2 and we will start the deploy .
+              cd /home/ubuntu/test &&
+              git pull origin dev &&
+              sudo npm i &&
+              sudo npm run build &&
+              '
