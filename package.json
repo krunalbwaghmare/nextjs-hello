@@ -1,12 +1,15 @@
 {
-  "name": "my-app",
+  "name": "boring-canvas",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "export": "next export",
+    "dev:static": "serve ./out",
+    "start": "NODE_ENV=production node server.js",
+    "prod": "pm2 start npm --name 'boringcanvas' -- start"
   },
   "dependencies": {
     "@types/node": "20.5.8",
