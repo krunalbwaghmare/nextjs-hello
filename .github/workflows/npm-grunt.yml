@@ -1,31 +1,42 @@
-name: Deploy Website to EC2
+name: CI/CD for Next.js on EC2
 
 on:
   push:
-    branches: [ main ]  # Change "main" to your branch name if different
+    branches:
+      - main # Change this to your main branch name
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest  # You can choose a different runner OS
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Deploy to Server
-        uses: easingthemes/ssh-deploy@main  # Or another SSH deployer action
+      - name: Install Node.js
+        uses: actions/setup-node@v2
         with:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          REMOTE_HOST: ${{ secrets.EC2_HOST }}
-          REMOTE_USER: ${{ secrets.EC2_USER }}
-          TARGET: /home/ubuntu/test  # Replace with the target directory on EC2
+          node-version: '14'
 
-      # Additional steps (optional):
-      # - name: Install dependencies (if needed)
-      #   run:  'sudo apt update && sudo apt install -y npm i'
+      - name: Install dependencies
+        run: npm install
 
-      - name: Build website (if needed)
-        run:  'cd /home/ubuntu/test && npm run build'  # Replace with your build command
+      - name: Build Next.js app
+        run: npm run build
 
-      - name: Restart web server (if needed)
-        run:  'sudo systemctl restart nginx.service'  # Replace with your service name
+      - name: Deploy to EC2 instance
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/test
+            git pull origin main
+            npm install
+            npm run build
+          port: 22
+          timeout: 30s
+          command_timeout: 10m
+          proxy_port: 22
+          proxy_timeout: 30s
