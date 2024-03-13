@@ -21,8 +21,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build Next.js app
-        run: npm run build
+      # - name: Build Next.js app
+      #   run: npm run build
 
       - name: Deploy to EC2 instance
         uses: easingthemes/ssh-deploy@main
