@@ -18,14 +18,14 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           REMOTE_HOST: ${{ secrets.EC2_HOST }}
           REMOTE_USER: ${{ secrets.EC2_USER }}
-          TARGET: /path/to/your/website/directory  # Replace with the target directory on EC2
+          TARGET: /home/ubuntu/test  # Replace with the target directory on EC2
 
       # Additional steps (optional):
       - name: Install dependencies (if needed)
         run: ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'sudo apt update && sudo apt install -y <package_name>'
 
       - name: Build website (if needed)
-        run: ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'cd /path/to/your/website/directory && <build_command>'  # Replace with your build command
+        run: ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'cd /home/ubuntu/test && npm run build'  # Replace with your build command
 
       - name: Restart web server (if needed)
-        run: ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'sudo systemctl restart <service_name>'  # Replace with your service name
+        run: ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'sudo systemctl restart nginx.service'  # Replace with your service name
