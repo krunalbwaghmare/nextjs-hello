@@ -1,32 +1,31 @@
-name: Deploy Next.js App to EC2
+name: Deploy Website to EC2
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]  # Change "main" to your branch name if different
 
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest  # You can choose a different runner OS
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Install dependencies
-      run: npm install
+      - name: Deploy to Server
+        uses: easingthemes/ssh-deploy@v4.2.1  # Or another SSH deployer action
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          REMOTE_HOST: ${{ secrets.EC2_HOST }}
+          REMOTE_USER: ${{ secrets.EC2_USER }}
+          TARGET: /path/to/your/website/directory  # Replace with the target directory on EC2
 
-    - name: Build Next.js app
-      run: npm run build
+      # Additional steps (optional):
+      - name: Install dependencies (if needed)
+        run: ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'sudo apt update && sudo apt install -y <package_name>'
 
-    - name: Deploy to EC2
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          cd /home/ubuntu/test
-          git pull origin main
-          npm install
-          npm run build
+      - name: Build website (if needed)
+        run: ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'cd /path/to/your/website/directory && <build_command>'  # Replace with your build command
+
+      - name: Restart web server (if needed)
+        run: ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'sudo systemctl restart <service_name>'  # Replace with your service name
