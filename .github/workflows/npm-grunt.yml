@@ -22,7 +22,7 @@ jobs:
 
       # Additional steps (optional):
       - name: Install dependencies (if needed)
-        run: ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'sudo apt update && sudo apt install -y <package_name>'
+        run:  'sudo apt update && sudo apt install -y npm i'
 
       - name: Build website (if needed)
         run: ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'cd /home/ubuntu/test && npm run build'  # Replace with your build command
