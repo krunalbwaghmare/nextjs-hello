@@ -26,7 +26,7 @@ jobs:
               # Now we have got the access of EC2 and we will start the deploy ok.
               cd /home/ubuntu/testing &&
               git pull origin main &&
-              npm i &&
-              npm run build &&
+              sudo npm i &&
+              sudo npm run build &&
               pm2 restart all
               '
